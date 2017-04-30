@@ -13,11 +13,13 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.StrictMode;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
 
 public class LocationService extends Service {
 
+    private LocationCallback mCallback;
     private Location mLastLocation;
     public static final String TAG = LocationService.class.getSimpleName();
     private LocationManager mLocationManager = null;
@@ -26,50 +28,18 @@ public class LocationService extends Service {
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
 
+
     public class LocalBinder extends Binder {
-        public LocationService getService() {
+
+        public LocationService getService(LocationCallback poCallback) {
+            mCallback = poCallback;
             return LocationService.this;
         }
     }
 
-    public Location getPosition(){
-        return mLastLocation;
+    public LatLng getPosition(){
+        return (mLastLocation==null)?null:new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
     }
-
-
-    private class LocationListener implements android.location.LocationListener {
-
-        public LocationListener(String provider) {
-            Log.e(TAG, "LocationListener " + provider);
-            mLastLocation = new Location(provider);
-        }
-
-        @Override
-        public void onLocationChanged(Location location) {
-            Log.e(TAG, "onLocationChanged: " + location);
-            mLastLocation.set(location);
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            Log.e(TAG, "onProviderDisabled: " + provider);
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            Log.e(TAG, "onProviderEnabled: " + provider);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.e(TAG, "onStatusChanged: " + provider);
-        }
-    }
-
-    LocationListener[] mLocationListeners = new LocationListener[]{
-            new LocationListener(LocationManager.GPS_PROVIDER),
-            new LocationListener(LocationManager.NETWORK_PROVIDER)
-    };
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -134,10 +104,54 @@ public class LocationService extends Service {
         }
     }
 
+    /////// Location methodss
+
     private void initializeLocationManager() {
         Log.e(TAG, "initializeLocationManager");
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }
     }
+
+    private class LocationListener implements android.location.LocationListener {
+
+        public LocationListener(String provider) {
+            Log.e(TAG, "LocationListener " + provider);
+            mLastLocation = new Location(provider);
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+            Log.e(TAG, "onLocationChanged: " + location);
+            mLastLocation.set(location);
+            if(mCallback!=null) mCallback.onLocationChange(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            Log.e(TAG, "onProviderDisabled: " + provider);
+            if(mCallback!=null) mCallback.onProviderDisabled(provider);
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            Log.e(TAG, "onProviderEnabled: " + provider);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            Log.e(TAG, "onStatusChanged: " + provider);
+        }
+    }
+
+    LocationListener[] mLocationListeners = new LocationListener[]{
+            new LocationListener(LocationManager.GPS_PROVIDER),
+            new LocationListener(LocationManager.NETWORK_PROVIDER)
+    };
+
+    public interface LocationCallback {
+        void onLocationChange(LatLng poLocation);
+        void onProviderDisabled(String psProvider);
+    }
+
 }

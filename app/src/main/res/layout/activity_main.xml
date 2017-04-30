@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.gerus.pulpomatic.views.MainActivity">
+    tools:context=".views.maps.MapsActivity">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -14,8 +14,6 @@
         android:id="@+id/map"
         tools:context=".MapsActivity"
         map:cameraBearing="112.5"
-        map:cameraTargetLat="-33.796923"
-        map:cameraTargetLng="150.922433"
         map:cameraTilt="30"
         map:cameraZoom="13"
         map:mapType="normal"
