@@ -3,4 +3,25 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <!-- Twitter colors -->
+    <color name="tw__solid_white">#FFFFFFFF</color>
+    <color name="tw__blue_default">#FF5BAAF4</color>
+    <color name="tw__blue_pressed">#FF4186C8</color>
+    <color name="tw__light_gray">#ccd6dd</color>
+
+    <!-- General colors -->
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="green">#ff58bb52</color>
+    <color name="teal">#009688</color>
+    <color name="blue">#03A9F4</color>
+    <color name="red">#FF594F</color>
+    <color name="yellow">#F2C122</color>
+    <color name="grey">#BDBDBD</color>
+    <color name="grey_dark">#444444</color>
+    <color name="orange">#FA8440</color>
+    <color name="blue_sky">#4CBFBD</color>
+
 </resources>

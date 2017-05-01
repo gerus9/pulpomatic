@@ -8,4 +8,24 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="ButtonTwitter">
+        <item name="android:textColor">@color/tw__solid_white</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/tw__login_btn_text_size</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/tw__login_btn</item>
+        <item name="android:paddingLeft">@dimen/dp10</item>
+        <item name="android:paddingRight">@dimen/dp15</item>
+        <item name="android:drawableRight">@mipmap/ic_twitter</item>
+        <item name="android:drawablePadding">@dimen/dp5</item>
+    </style>
+
+    <style name="FloatingButton">
+        <item name="android:layout_width">56dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_marginRight">25dp</item>
+        <item name="android:layout_marginBottom">65dp</item>
+    </style>
+
 </resources>
