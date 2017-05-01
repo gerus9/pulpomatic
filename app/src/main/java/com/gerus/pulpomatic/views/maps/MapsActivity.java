@@ -1,16 +1,21 @@
 package com.gerus.pulpomatic.views.maps;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gerus.pulpomatic.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,14 +32,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     @BindView(R.id.myFAB)
     protected TextView btnFake;
 
-    @BindView(R.id.card_view)
-    protected CardView mCardView;
+    @BindView(R.id.infoDestiny)
+    protected FrameLayout frameLayout;
 
     @BindView(R.id.btn_postion)
     protected FloatingActionButton btnPostion;
@@ -44,6 +50,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SupportMapFragment mapFragment;
     private MapsPresenter mPresenter;
     private GoogleMap mMap;
+
+    private Animation animShow, animHide;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,27 +63,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
         mPresenter = new MapsPresenterImpl(this);
 
-        btnPostion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                btnErase.show();
-            }
-        });
+        initAnimation();
 
-        btnFake.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                btnErase.hide();
-            }
-        });
+    }
 
-        btnErase.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.setCleanMarkers();
-            }
-        });
-
+    private void initAnimation()
+    {
+        animShow = AnimationUtils.loadAnimation( this, R.anim.view_show);
+        animHide = AnimationUtils.loadAnimation( this, R.anim.view_hide);
     }
 
     @Override
@@ -109,7 +104,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
         //Properties
         mMap.setOnMapClickListener(this);
-        mMap.setMyLocationEnabled(true);
 
         mPresenter.setOnMapReady();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -132,12 +126,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void showMessage(String psMsg) {
-        mCardView.setVisibility(View.VISIBLE);
+        //frameLayout.setVisibility(View.VISIBLE);
+        //prcAnimate(frameLayout, true);
+        setVisible(frameLayout,true);
         btnFake.setText(psMsg);
     }
 
     public void showTweet(String psMsg) {
 
+    }
+
+    public void setModifyPaddingMaps(){
+        int padding = (int) getResources().getDimension(R.dimen.dp15);
+        mMap.setPadding(padding,padding,padding,frameLayout.getHeight());
+    }
+
+    public void setOriginalPaddingMaps(){
+        int padding = (int) getResources().getDimension(R.dimen.dp15);
+        mMap.setPadding(padding,padding,padding,padding);
     }
 
     public Marker showMarkers(int idImage, LatLng poCurrentPosition) {
@@ -155,6 +161,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void hideCardView(){
-        mCardView.setVisibility(View.GONE);
+        setVisible(frameLayout, false);
     }
+
+    private void setVisible(View poView, boolean pbShow) {
+        if(pbShow){
+            poView.setVisibility(View.VISIBLE);
+            poView.startAnimation(animShow);
+        } else {
+            poView.startAnimation(animHide);
+            poView.setVisibility(View.GONE);
+        }
+
+    }
+
+    @OnClick(R.id.btn_postion)
+    public void submit(View view) {
+        mPresenter.setCenterPosition();
+    }
+
+    @OnClick(R.id.btn_erase)
+    public void resetMarker(View view) {
+        mPresenter.setCleanMarkers();
+    }
+
+
 }

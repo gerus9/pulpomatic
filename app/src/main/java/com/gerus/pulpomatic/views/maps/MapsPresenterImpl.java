@@ -86,6 +86,7 @@ public class MapsPresenterImpl implements MapsPresenter {
     @Override
     public void setOnMapReady() {
 
+        mView.setOriginalPaddingMaps();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -97,7 +98,7 @@ public class MapsPresenterImpl implements MapsPresenter {
                     showDestinyMarker(mInteractor.getDestinyMarker());
                 }
             }
-        }, 2500);
+        }, 1500);
     }
 
 
@@ -108,6 +109,14 @@ public class MapsPresenterImpl implements MapsPresenter {
             if (mGeoference != null) mGeoference.remove();
             mInteractor.removeDestinyMarker();
             mView.hideCardView();
+            mView.setOriginalPaddingMaps();
+        }
+    }
+
+    @Override
+    public void setCenterPosition() {
+        if (mInteractor.getCurrentPosition() != null) {
+            mView.showCenterMap(mInteractor.getCurrentPosition());
         }
     }
 
@@ -128,6 +137,7 @@ public class MapsPresenterImpl implements MapsPresenter {
     @Override
     public void onDistance(RulesVO poRules) {
         mView.showMessage(poRules.getText());
+        mView.setModifyPaddingMaps();
         if (mGeoference != null) {mGeoference.remove();}
         mGeoference = mView.showGeoference(mInteractor.getDestinyMarker(), (int) poRules.getDistance(), poRules.getColor());
 

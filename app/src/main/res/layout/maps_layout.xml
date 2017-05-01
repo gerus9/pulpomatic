@@ -6,38 +6,76 @@
     android:layout_height="match_parent"
     tools:context=".views.maps.MapsActivity">
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        map:cameraTargetLat="19.432608"
-        map:cameraTargetLng="-99.133209"
-        map:cameraZoom="13"
-        map:mapType="normal"
-        map:uiCompass="true"
-        map:uiRotateGestures="true"
-        map:uiScrollGestures="true"
-        map:uiTiltGestures="true"
-        map:uiZoomControls="true"
-        map:uiZoomGestures="true"
+        app:cameraTargetLat="19.432608"
+        app:cameraTargetLng="-99.133209"
+        app:cameraZoom="13"
+        app:mapType="normal"
+        app:uiCompass="true"
+        app:uiRotateGestures="true"
+        app:uiScrollGestures="true"
+        app:uiTiltGestures="true"
+        app:uiZoomControls="true"
+        app:uiZoomGestures="true"
         tools:context=".MapsActivity" />
 
-    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
+        android:weightSum="5"
+        android:visibility="visible"
+        android:layout_gravity="top"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_weight="3"
+            android:layout_height="56dp"
+            android:layout_width="150dp"
+            android:layout_margin="15dp"
+            style="@style/ButtonTwitter"
+            android:text="tweet" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/dp15"
+            android:src="@drawable/vc_navigation"
+            app:backgroundTint="@color/yellow"
+            app:elevation="4dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_postion"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/dp15"
+            android:src="@drawable/vc_my_location"
+            app:backgroundTint="@android:color/white"
+            app:elevation="4dp" />
+
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:id="@+id/infoDestiny"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:animateLayoutChanges="true"
         android:orientation="vertical">
 
         <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/card_view"
-            android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="@dimen/cardview_info"
             android:layout_gravity="left|bottom"
-            android:layout_margin="15dp"
+            android:layout_margin="@dimen/dp15"
+            card_view:cardBackgroundColor="@color/white"
             card_view:cardCornerRadius="4dp">
 
             <TextView
@@ -45,36 +83,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:src="@mipmap/ic_personal_marker"
-                android:text="@string/accept"
-                android:textColor="@android:color/white" />
+                android:textColor="@color/grey"
+                android:textStyle="bold"
+                android:src="@mipmap/ic_personal_marker" />
 
         </android.support.v7.widget.CardView>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/btn_erase"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|bottom"
-            android:layout_margin="30dp"
-            android:src="@mipmap/ic_personal_marker"
-            app:backgroundTint="@android:color/white"
-            app:elevation="4dp" />
+            android:src="@drawable/vc_delete"
+            android:layout_gravity="right|top"
+            app:backgroundTint="@color/red"
+            app:elevation="4dp"
+            style="@style/FloatingButton" />
 
-    </android.support.design.widget.CoordinatorLayout>
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_postion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|bottom"
-        android:layout_margin="30dp"
-        android:visibility="gone"
-        android:src="@mipmap/ic_personal_marker"
-        app:backgroundTint="@android:color/holo_blue_bright"
-        app:elevation="4dp" />
-
+    </FrameLayout>
 
 
 </FrameLayout>

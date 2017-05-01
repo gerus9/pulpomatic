@@ -13,6 +13,7 @@ public interface MapsPresenter extends BasePresenter {
     void setMapClick(LatLng mPosition);
     void setOnMapReady();
     void setCleanMarkers();
+    void setCenterPosition();
     boolean isPreviousMarker();
 
     void onPositionChange(LatLng mPosition);
