@@ -1,5 +1,6 @@
 package com.gerus.pulpomatic.views.maps;
 
+import com.gerus.pulpomatic.RulesVO;
 import com.gerus.pulpomatic.base.BasePresenter;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -9,10 +10,13 @@ import com.google.android.gms.maps.model.LatLng;
 
 public interface MapsPresenter extends BasePresenter {
 
-    void onMapClick(LatLng mPosition);
-    void setResetMarker();
+    void setMapClick(LatLng mPosition);
+    void setOnMapReady();
+    void setCleanMarkers();
     boolean isPreviousMarker();
 
     void onPositionChange(LatLng mPosition);
+    void onDistance(RulesVO poRules);
+
 
 }

@@ -11,9 +11,12 @@ import com.google.android.gms.maps.model.LatLng;
 public interface MapsInteractor {
 
     LatLng getCurrentPosition();
-    LatLng getMarkerPosition();
-    void setMarkerPosition(LatLng poLastPosition);
-
+    LatLng getDestinyMarker();
+    void getDistance();
+    void setDestinyMarker(LatLng poLastPosition);
+    void removeDestinyMarker();
 
     ServiceConnection getLocationConnection();
+    void setActivityLive(boolean poActivityLive);
+
 }
