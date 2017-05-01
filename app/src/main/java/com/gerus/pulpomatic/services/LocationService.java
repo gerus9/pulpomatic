@@ -56,6 +56,11 @@ public class LocationService extends Service {
 
     public void onActivityLive(boolean poActivityLive) {
         isActiveAlive = poActivityLive;
+        if(isActiveAlive){
+            mNotifications.prcRemoveNotificationStatus();
+        } else {
+            if (getDestiny() != null) mNotifications.prcStatus(mRules.getText());
+        }
     }
 
     public void getDistance() {
@@ -67,9 +72,13 @@ public class LocationService extends Service {
                 Log.e(TAG, "mRules: " + (mRules==null)+"");
                 mCallback.onDistance(mRules);
             } else {
-                mNotifications.prcStatus(mRules.getText());
+                prcShowNotification();
             }
         }
+    }
+
+    private void prcShowNotification() {
+        mNotifications.prcStatus(mRules.getText());
     }
 
 
@@ -87,15 +96,13 @@ public class LocationService extends Service {
 
     @Override
     public IBinder onBind(Intent arg0) {
-        isActiveAlive = true;
-        mNotifications.prcRemoveNotificationStatus();
+        onActivityLive(true);
         return mBinder;
     }
 
     @Override
     public void unbindService(ServiceConnection conn) {
         Log.e(TAG, "unbindService");
-        isActiveAlive = false;
         super.unbindService(conn);
     }
 
