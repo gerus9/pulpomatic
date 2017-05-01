@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Pulpomatic</string>
+    <string name="distance_200">Estás muy lejos del punto objetivo</string>
+    <string name="distance_100">Estás lejos del punto objetivo</string>
+    <string name="distance_50">Estás próximo al punto objetivo</string>
+    <string name="distance_10">Estás muy próximo al punto objetivo</string>
+    <string name="distance_0">Estás en el punto objetivo</string>
 </resources>

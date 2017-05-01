@@ -4,6 +4,7 @@ package com.gerus.pulpomatic.services;
  * Created by gerus-mac on 28/04/17.
  */
 
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,18 +16,61 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.gerus.pulpomatic.Notifications;
+import com.gerus.pulpomatic.RulesVO;
+import com.gerus.pulpomatic.sharedPreferences.MapsSP;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.List;
 
 public class LocationService extends Service {
 
     private LocationCallback mCallback;
-    private Location mLastLocation;
+    private Location mLastLocation = new Location("");
+    private Location mDestiny;
     public static final String TAG = LocationService.class.getSimpleName();
     private LocationManager mLocationManager = null;
+    private static boolean isActiveAlive = false;
+    private boolean isChangePosition = false;
     private final IBinder mBinder = new LocalBinder();
+    private RulesVO mRules;
+    private Notifications mNotifications;
 
-    private static final int LOCATION_INTERVAL = 1000;
-    private static final float LOCATION_DISTANCE = 10f;
+    private static final int LOCATION_INTERVAL = 5000;
+    private static final float LOCATION_DISTANCE = 50f;
+
+
+    public Location getDestiny() {
+        return mDestiny;
+    }
+
+    public void setDestiny(LatLng poLatLng) {
+        if(poLatLng==null){
+            mDestiny = null;
+        } else {
+            this.mDestiny = new Location("");
+            mDestiny.setLatitude(poLatLng.latitude);
+            mDestiny.setLongitude(poLatLng.longitude);
+        }
+    }
+
+    public void onActivityLive(boolean poActivityLive) {
+        isActiveAlive = poActivityLive;
+    }
+
+    public void getDistance() {
+        if (getDestiny() != null){
+            mRules.setDistance(mLastLocation.distanceTo(getDestiny()));
+            Log.e(TAG, "distance: " + mRules.getDistance());
+            if(isActiveAlive && mCallback!=null){
+                Log.e(TAG, "mCallback: "+ (mCallback==null)+"");
+                Log.e(TAG, "mRules: " + (mRules==null)+"");
+                mCallback.onDistance(mRules);
+            } else {
+                mNotifications.prcStatus(mRules.getText());
+            }
+        }
+    }
 
 
     public class LocalBinder extends Binder {
@@ -37,18 +81,21 @@ public class LocationService extends Service {
         }
     }
 
-    public LatLng getPosition(){
-        return (mLastLocation==null)?null:new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+    public LatLng getPosition() {
+        return (isChangePosition) ? new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()): null;
     }
 
     @Override
     public IBinder onBind(Intent arg0) {
+        isActiveAlive = true;
+        mNotifications.prcRemoveNotificationStatus();
         return mBinder;
     }
 
     @Override
     public void unbindService(ServiceConnection conn) {
         Log.e(TAG, "unbindService");
+        isActiveAlive = false;
         super.unbindService(conn);
     }
 
@@ -56,18 +103,19 @@ public class LocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-        init();
         return START_STICKY;
     }
 
     @Override
     public void onCreate() {
-        Log.e(TAG, "onCreate");
+        Log.e(TAG, "onCreate "+isActiveAlive);
+        isActiveAlive = false;
         init();
     }
 
     private void init() {
         Log.e(TAG, "init");
+
         initializeLocationManager();
         try {
             mLocationManager.requestLocationUpdates(
@@ -87,6 +135,13 @@ public class LocationService extends Service {
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
+        mRules = new RulesVO(getApplication());
+        mNotifications = new Notifications(getApplication());
+        LatLng voDestiny = new MapsSP(getApplication()).getLastDestinyPosition();
+        if(voDestiny!=null){
+            setDestiny(voDestiny);
+        }
+
     }
 
     @Override
@@ -117,20 +172,23 @@ public class LocationService extends Service {
 
         public LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
-            mLastLocation = new Location(provider);
         }
 
         @Override
         public void onLocationChanged(Location location) {
-            Log.e(TAG, "onLocationChanged: " + location);
+            Log.e(TAG, "Lat:" + location.getLatitude() +" Long:" +location.getLongitude());
+            Log.e(TAG, "isActiveAlive: " + isActiveAlive);
+            isChangePosition = true;
             mLastLocation.set(location);
             if(mCallback!=null) mCallback.onLocationChange(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            getDistance();
         }
+
 
         @Override
         public void onProviderDisabled(String provider) {
             Log.e(TAG, "onProviderDisabled: " + provider);
-            if(mCallback!=null) mCallback.onProviderDisabled(provider);
+            if (mCallback != null) mCallback.onProviderDisabled(provider);
         }
 
         @Override
@@ -144,6 +202,20 @@ public class LocationService extends Service {
         }
     }
 
+    public static boolean isAppRunning(final Context context, final String packageName) {
+        final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        final List<ActivityManager.RunningAppProcessInfo> procInfos = activityManager.getRunningAppProcesses();
+        if (procInfos != null)
+        {
+            for (final ActivityManager.RunningAppProcessInfo processInfo : procInfos) {
+                if (processInfo.processName.equals(packageName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER)
@@ -151,7 +223,10 @@ public class LocationService extends Service {
 
     public interface LocationCallback {
         void onLocationChange(LatLng poLocation);
+
         void onProviderDisabled(String psProvider);
+
+        void onDistance(RulesVO poRules);
     }
 
 }
