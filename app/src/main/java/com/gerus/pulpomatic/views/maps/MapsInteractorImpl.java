@@ -1,12 +1,11 @@
 package com.gerus.pulpomatic.views.maps;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.gerus.pulpomatic.RulesVO;
+import com.gerus.pulpomatic.models.RulesVO;
 import com.gerus.pulpomatic.base.BaseInteractorImpl;
 import com.gerus.pulpomatic.services.LocationService;
 import com.google.android.gms.maps.model.LatLng;

@@ -1,18 +1,25 @@
 package com.gerus.pulpomatic.views.maps;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.gerus.pulpomatic.R;
-import com.gerus.pulpomatic.RulesVO;
+import com.gerus.pulpomatic.models.RulesVO;
 import com.gerus.pulpomatic.navigator.Navigator;
-import com.gerus.pulpomatic.services.LocationService;
+import com.gerus.pulpomatic.utils.UImages;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
+
+import java.util.List;
 
 
 /**
@@ -34,8 +41,8 @@ public class MapsPresenterImpl implements MapsPresenter {
 
     @Override
     public void start() {
-        mInteractor.setActivityLive(true);
         mView.bindService(Navigator.getService(mView), mInteractor.getLocationConnection(), Context.BIND_AUTO_CREATE);
+        mInteractor.setActivityLive(true);
     }
 
     @Override
@@ -51,12 +58,16 @@ public class MapsPresenterImpl implements MapsPresenter {
     @Override
     public void stop() {
         mInteractor.setActivityLive(false);
-        mView.unbindService(mInteractor.getLocationConnection());
+        if(!isPreviousMarker()){
+            Log.e("unbindService", "servicio");
+            mView.unbindService(mInteractor.getLocationConnection());
+            Log.e("unbindService", "OK");
+        }
     }
+
 
     @Override
     public void terminate() {
-        Log.d("Entre", "terminate");
         if (!isPreviousMarker()) {
             Log.e("MUEReeeeeee", "servicio");
             mView.stopService(Navigator.getService(getContext()));
@@ -70,17 +81,20 @@ public class MapsPresenterImpl implements MapsPresenter {
 
     @Override
     public void setMapClick(LatLng mPosition) {
-        if(!isPreviousMarker()){
-            showDestinyMarker(mPosition);
+        if (isPreviousMarker()) {
+            mView.shakeDelete();
+        } else {
+            mView.showQuestionMarker(mPosition);
         }
-
     }
 
     private void showDestinyMarker(LatLng poPosition) {
         if (mDestinyMarker != null) mDestinyMarker.remove();
-        mDestinyMarker = mView.showMarkers(R.mipmap.ic_marker, poPosition);
+        mDestinyMarker = mView.showMarkers(R.drawable.ic_marker, poPosition);
         mInteractor.setDestinyMarker(poPosition);
         mInteractor.getDistance();
+        mView.hideSearchButton();
+        mView.showZoomButton();
     }
 
     @Override
@@ -98,7 +112,7 @@ public class MapsPresenterImpl implements MapsPresenter {
                     showDestinyMarker(mInteractor.getDestinyMarker());
                 }
             }
-        }, 1500);
+        }, 1000);
     }
 
 
@@ -110,6 +124,9 @@ public class MapsPresenterImpl implements MapsPresenter {
             mInteractor.removeDestinyMarker();
             mView.hideCardView();
             mView.setOriginalPaddingMaps();
+            mView.hideTweet();
+            mView.showSearchButton();
+            mView.hideZoomButton();
         }
     }
 
@@ -117,7 +134,23 @@ public class MapsPresenterImpl implements MapsPresenter {
     public void setCenterPosition() {
         if (mInteractor.getCurrentPosition() != null) {
             mView.showCenterMap(mInteractor.getCurrentPosition());
+        } else {
+            mView.showDialogNotPosition();
         }
+    }
+
+    @Override
+    public void setFindDestiny() {
+        if (mInteractor.getDestinyMarker() != null) {
+            mView.showCenterMap(mInteractor.getDestinyMarker());
+        }
+    }
+
+    @Override
+    public void setSaveDestiny(LatLng poLatLng) {
+        showDestinyMarker(poLatLng);
+        mView.showCenterMap(poLatLng);
+        mView.hideSearchButton();
     }
 
     @Override
@@ -126,11 +159,45 @@ public class MapsPresenterImpl implements MapsPresenter {
     }
 
     @Override
+    public LatLngBounds getMarkers() {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        if (mPersonalMarker != null) builder.include(mPersonalMarker.getPosition());
+        if (mDestinyMarker != null) builder.include(mDestinyMarker.getPosition());
+        return builder.build();
+    }
+
+    @Override
+    public void sendSnapShot(Bitmap bitmap) {
+
+        String psTxt = String.format(mView.getString(R.string.tweet), mDestinyMarker.getPosition().latitude, mDestinyMarker.getPosition().longitude);
+        boolean isTwitter = false;
+        String twitter_package= "com.twitter.android";
+        String path = MediaStore.Images.Media.insertImage(mView.getContentResolver(), UImages.prcCompressBitmap(bitmap), mView.getString(R.string.description_image), null);
+
+        Intent viTweetIntent = Navigator.getTwitter(Uri.parse(path), psTxt);
+        final PackageManager packageManager = mView.getPackageManager();
+        List<ResolveInfo> list = packageManager.queryIntentActivities(viTweetIntent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        for (ResolveInfo resolveInfo : list) {
+            String p = resolveInfo.activityInfo.packageName;
+            if (p != null && p.startsWith(twitter_package)) {
+                viTweetIntent.setPackage(p);
+                isTwitter = true;
+                break;
+            }
+        }
+        if(isTwitter){
+            mView.startActivity(viTweetIntent);
+        } else {
+            mView.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + twitter_package)));
+        }
+    }
+
+    @Override
     public void onPositionChange(LatLng mPosition) {
-        Log.d("MapsPresenterImpl", "onPositionChange");
         if (mPosition != null) {
             if (mPersonalMarker != null) mPersonalMarker.remove();
-            mPersonalMarker = mView.showMarkers(R.mipmap.ic_personal_marker, mPosition);
+            mPersonalMarker = mView.showMarkers(R.drawable.ic_personal_marker, mPosition);
         }
     }
 
@@ -138,9 +205,16 @@ public class MapsPresenterImpl implements MapsPresenter {
     public void onDistance(RulesVO poRules) {
         mView.showMessage(poRules.getText());
         mView.setModifyPaddingMaps();
-        if (mGeoference != null) {mGeoference.remove();}
+        if (mGeoference != null) {
+            mGeoference.remove();
+        }
         mGeoference = mView.showGeoference(mInteractor.getDestinyMarker(), (int) poRules.getDistance(), poRules.getColor());
 
+        if (poRules.isNearly()) {
+            mView.showTweet();
+        } else {
+            mView.hideTweet();
+        }
     }
 
 }
