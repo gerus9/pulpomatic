@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+String app_name = 'Pulpomatic'
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -16,11 +18,13 @@ android {
         release {
             minifyEnabled false
             buildConfigField "boolean", "LOG", "false"
+            resValue "string", "app_name", app_name
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         debug{
             applicationIdSuffix ".dev"
+            resValue "string", "app_name", "P_dev"
             buildConfigField "boolean", "LOG", "true"
         }
     }
