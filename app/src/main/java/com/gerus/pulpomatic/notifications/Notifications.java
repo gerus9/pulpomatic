@@ -1,4 +1,4 @@
-package com.gerus.pulpomatic;
+package com.gerus.pulpomatic.notifications;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 
+import com.gerus.pulpomatic.R;
 import com.gerus.pulpomatic.views.maps.MapsActivity;
 
 /**
@@ -33,8 +34,8 @@ public class Notifications {
         PendingIntent voPendientMap = PendingIntent.getActivity(mContext, ID_STATUS, new Intent(mContext, MapsActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
 
 
-        mNotificationBuilder.setSmallIcon(R.mipmap.ic_personal_marker)
-                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_personal_marker))
+        mNotificationBuilder.setSmallIcon(R.drawable.ic_notification)
+                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_marker))
                 .setContentTitle(mContext.getString(R.string.app_name))
                 .setContentText(psMsg)
                 .setAutoCancel(true)

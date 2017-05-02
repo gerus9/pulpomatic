@@ -16,8 +16,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.gerus.pulpomatic.Notifications;
-import com.gerus.pulpomatic.RulesVO;
+import com.gerus.pulpomatic.notifications.Notifications;
+import com.gerus.pulpomatic.models.RulesVO;
 import com.gerus.pulpomatic.sharedPreferences.MapsSP;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,19 +25,25 @@ import java.util.List;
 
 public class LocationService extends Service {
 
+    public static final int LOCATION_INTERVAL_DEFAULT = 500;  // 10 min
+    public static final float LOCATION_DISTANCE_DEFAULT = 50f;  //
+
     private LocationCallback mCallback;
     private Location mLastLocation = new Location("");
-    private Location mDestiny;
-    public static final String TAG = LocationService.class.getSimpleName();
     private LocationManager mLocationManager = null;
+    private Location mDestiny;
+
+    private static final String TAG = LocationService.class.getSimpleName();
     private static boolean isActiveAlive = false;
+
+    private int LOCATION_INTERVAL = LOCATION_INTERVAL_DEFAULT;
+    private float LOCATION_DISTANCE = LOCATION_DISTANCE_DEFAULT;
+
     private boolean isChangePosition = false;
     private final IBinder mBinder = new LocalBinder();
     private RulesVO mRules;
     private Notifications mNotifications;
 
-    private static final int LOCATION_INTERVAL = 5000;
-    private static final float LOCATION_DISTANCE = 50f;
 
 
     public Location getDestiny() {
@@ -67,6 +73,7 @@ public class LocationService extends Service {
         if (getDestiny() != null){
             mRules.setDistance(mLastLocation.distanceTo(getDestiny()));
             Log.e(TAG, "distance: " + mRules.getDistance());
+            //prcUpdateIntervals(mRules.getDistance());
             if(isActiveAlive && mCallback!=null){
                 Log.e(TAG, "mCallback: "+ (mCallback==null)+"");
                 Log.e(TAG, "mRules: " + (mRules==null)+"");
@@ -77,10 +84,24 @@ public class LocationService extends Service {
         }
     }
 
+    private void prcUpdateIntervals(double poDistance) {
+        if(poDistance > RulesVO.MAX_VALUE){
+            Log.e(TAG, " *** poDistance > RulesVO.MAX_VALUE *** ");
+            if(mRules.LOCATION_INTERVAL != LOCATION_INTERVAL){
+                Log.e(TAG, " *** Cambie los listeners *** ");
+                mRules.LOCATION_DISTANCE = LOCATION_DISTANCE;
+                mRules.LOCATION_INTERVAL = LOCATION_INTERVAL;
+                Log.e(TAG, " *** LOCATION_DISTANCE: "+LOCATION_DISTANCE);
+                Log.e(TAG, " *** LOCATION_INTERVAL: "+LOCATION_INTERVAL);
+                prcRemoveLister();
+                prcCreateListeners();
+            }
+        }
+    }
+
     private void prcShowNotification() {
         mNotifications.prcStatus(mRules.getText());
     }
-
 
     public class LocalBinder extends Binder {
 
@@ -124,24 +145,7 @@ public class LocationService extends Service {
         Log.e(TAG, "init");
 
         initializeLocationManager();
-        try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[1]);
-        } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
-        }
-        try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[0]);
-        } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "gps provider does not exist " + ex.getMessage());
-        }
+        prcCreateListeners();
         mRules = new RulesVO(getApplication());
         mNotifications = new Notifications(getApplication());
         LatLng voDestiny = new MapsSP(getApplication()).getLastDestinyPosition();
@@ -151,10 +155,27 @@ public class LocationService extends Service {
 
     }
 
+    private void prcCreateListeners() {
+        Log.e(TAG, "Create Listener");
+        try {
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[0]);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[1]);
+        } catch (java.lang.SecurityException ex) {
+            Log.i(TAG, "fail to request location update, ignore", ex);
+        } catch (IllegalArgumentException ex) {
+            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+        }
+    }
+
     @Override
     public void onDestroy() {
         Log.e(TAG, "onDestroy");
         super.onDestroy();
+        prcRemoveLister();
+    }
+
+    private void prcRemoveLister() {
+        Log.e(TAG, "Remove Listener");
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
@@ -224,8 +245,8 @@ public class LocationService extends Service {
     }
 
     LocationListener[] mLocationListeners = new LocationListener[]{
-            new LocationListener(LocationManager.GPS_PROVIDER),
-            new LocationListener(LocationManager.NETWORK_PROVIDER)
+            new LocationListener(LocationManager.NETWORK_PROVIDER),
+            new LocationListener(LocationManager.GPS_PROVIDER)
     };
 
     public interface LocationCallback {
