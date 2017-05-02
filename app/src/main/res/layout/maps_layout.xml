@@ -16,88 +16,70 @@
         app:cameraZoom="13"
         app:mapType="normal"
         app:uiCompass="true"
-        app:uiRotateGestures="true"
-        app:uiScrollGestures="true"
-        app:uiTiltGestures="true"
-        app:uiZoomControls="true"
-        app:uiZoomGestures="true"
         tools:context=".MapsActivity" />
 
     <LinearLayout
-        android:weightSum="5"
-        android:visibility="visible"
-        android:layout_gravity="top"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:orientation="vertical">
+
+        <include layout="@layout/toolbar" />
 
         <Button
-            android:layout_weight="3"
-            android:layout_height="56dp"
-            android:layout_width="150dp"
-            android:layout_margin="15dp"
+            android:id="@+id/btn_tweet"
             style="@style/ButtonTwitter"
-            android:text="tweet" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:layout_margin="@dimen/dp15"
-            android:src="@drawable/vc_navigation"
-            app:backgroundTint="@color/yellow"
-            app:elevation="4dp" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/btn_postion"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:layout_margin="@dimen/dp15"
-            android:src="@drawable/vc_my_location"
-            app:backgroundTint="@android:color/white"
-            app:elevation="4dp" />
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="15dp"
+            android:text="@string/send_tweet"
+            android:visibility="gone" />
 
     </LinearLayout>
 
 
     <FrameLayout
         android:id="@+id/infoDestiny"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="left|bottom"
         android:animateLayoutChanges="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="@dimen/cardview_info"
             android:layout_gravity="left|bottom"
             android:layout_margin="@dimen/dp15"
-            card_view:cardBackgroundColor="@color/white"
+            android:background="?selectableItemBackground"
             card_view:cardCornerRadius="4dp">
 
             <TextView
                 android:id="@+id/myFAB"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:textColor="@color/grey"
-                android:textStyle="bold"
-                android:src="@mipmap/ic_personal_marker" />
+                android:drawableLeft="@drawable/vc_navigation"
+                android:drawablePadding="@dimen/dp15"
+                android:gravity="center_vertical"
+                android:padding="@dimen/dp15"
+                android:text="@string/app_name"
+                android:textColor="@color/grey_dark"
+                android:textStyle="bold" />
 
         </android.support.v7.widget.CardView>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/btn_erase"
-            android:src="@drawable/vc_delete"
+            style="@style/FloatingButton"
             android:layout_gravity="right|top"
+            android:layout_marginBottom="65dp"
+            android:layout_marginRight="25dp"
+            android:src="@drawable/vc_delete"
             app:backgroundTint="@color/red"
-            app:elevation="4dp"
-            style="@style/FloatingButton" />
+            app:elevation="4dp" />
 
     </FrameLayout>
-
 
 </FrameLayout>

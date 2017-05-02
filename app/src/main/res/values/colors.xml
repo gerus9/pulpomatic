@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimaryDark">#BB303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="colorPrimaryTransparent">#BB3F51B5</color>
+    <color name="colorWhiteTransparent">#BBFFFFFF</color>
+
+    <!-- Circle colors -->
+    <color name="circle_level_5">#55FF594F</color>
+    <color name="circle_level_4">#55FA8440</color>
+    <color name="circle_level_3">#55F2C122</color>
+    <color name="circle_level_2">#5503A9F4</color>
+    <color name="circle_level_1">#5558bb52</color>
 
     <!-- Twitter colors -->
     <color name="tw__solid_white">#FFFFFFFF</color>

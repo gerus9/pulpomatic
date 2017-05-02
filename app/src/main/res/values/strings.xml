@@ -1,8 +1,19 @@
 <resources>
     <string name="app_name">Pulpomatic</string>
+
+    <string name="search">Buscar</string>
+
     <string name="distance_200">Estás muy lejos del punto objetivo</string>
     <string name="distance_100">Estás lejos del punto objetivo</string>
     <string name="distance_50">Estás próximo al punto objetivo</string>
     <string name="distance_10">Estás muy próximo al punto objetivo</string>
     <string name="distance_0">Estás en el punto objetivo</string>
+
+    <string name="permission">Es necesario poder acceder tu ubicación para determinar tu ubicación y acceso a tu almacenamiento para poder la imagen que se manda via twitter</string>
+
+    <string name="tweet" formatted="false">Esta es mi ubicación: %1f , %2f </string>
+    <string name="send_tweet">Enviar tweet</string>
+    <string name="description_image">Snapshot google maps</string>
+    <string name="progress_snapshot">Tomando la cáptura de pantalla</string>
+
 </resources>
