@@ -7,5 +7,10 @@
     android:layout_height="match_parent"
     tools:context=".views.maps.MapsActivity">
 
+    <ImageView
+        android:src="@drawable/ic_splash"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 
 </FrameLayout>
