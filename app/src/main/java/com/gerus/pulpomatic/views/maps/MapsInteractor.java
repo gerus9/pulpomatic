@@ -15,7 +15,7 @@ public interface MapsInteractor {
     void getDistance();
     void setDestinyMarker(LatLng poLastPosition);
     void removeDestinyMarker();
-
+    void getLastKnowPosition();
     ServiceConnection getLocationConnection();
     void setActivityLive(boolean poActivityLive);
 

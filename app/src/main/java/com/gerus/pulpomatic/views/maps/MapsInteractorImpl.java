@@ -54,6 +54,11 @@ public class MapsInteractorImpl extends BaseInteractorImpl implements MapsIntera
     }
 
     @Override
+    public void getLastKnowPosition() {
+        if(mLocationService!=null) mLocationService.getLastPosition();
+    }
+
+    @Override
     public ServiceConnection getLocationConnection() {
         if(mServiceConnection ==null){
             mServiceConnection = new ServiceConnection() {

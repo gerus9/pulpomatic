@@ -136,6 +136,7 @@ public class MapsPresenterImpl implements MapsPresenter {
             mView.showCenterMap(mInteractor.getCurrentPosition());
         } else {
             mView.showDialogNotPosition();
+            mInteractor.getLastKnowPosition();
         }
     }
 
