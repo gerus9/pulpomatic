@@ -1,0 +1,4 @@
+<resources>
+    <string name="error_no_position">Estamos buscando, la posición más cercana, verifica que este encendido tu GPS</string>
+    <string name="error_permissions">Es necesario que aceptes los permisos para continuar</string>
+</resources>
