@@ -30,8 +30,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    public static final int LOCATION_INTERVAL_DEFAULT = 450000;  // 10 min
-    public static final float LOCATION_DISTANCE_DEFAULT = 500f;  //
+    public static final int LOCATION_INTERVAL_DEFAULT = 150000;  // 10 min
+    public static final float LOCATION_DISTANCE_DEFAULT = 40f;  //
 
     private LocationCallback mCallback;
     private Location mLastLocation = new Location("");
