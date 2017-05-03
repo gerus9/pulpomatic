@@ -2,7 +2,6 @@ package com.gerus.pulpomatic.views.maps;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -30,7 +29,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlacePicker;
@@ -58,6 +56,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 20;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 30;
+    public static boolean isLive = false;
 
     @BindView(R.id.myFAB)
     protected TextView btnFake;
@@ -85,6 +84,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("Ger", "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.maps_layout);
         ButterKnife.bind(this);
@@ -100,6 +100,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void initAnimation() {
+        Log.d("Ger", "initAnimation");
         animShow = AnimationUtils.loadAnimation(this, R.anim.view_show);
         animHide = AnimationUtils.loadAnimation(this, R.anim.view_hide);
         animShake = AnimationUtils.loadAnimation(this, R.anim.view_shake);
@@ -107,25 +108,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onStart() {
+        Log.d("Ger", "onStart");
         mPresenter.start();
+        isLive = true;
         super.onStart();
     }
 
     @Override
     protected void onResume() {
+        Log.d("Ger", "onResume");
         mPresenter.resume();
         super.onResume();
     }
 
     @Override
     protected void onStop() {
+        Log.d("Ger", "Stop");
         mPresenter.stop();
+        isLive = false;
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        Log.d("Ger", "Entre al destroy");
+        Log.d("Ger", "onDestroy");
         mPresenter.terminate();
         super.onDestroy();
     }
@@ -177,23 +183,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d("Ger", "onMapReady");
         mMap = googleMap;
         prcOnMapReady();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
             return;
         }
         mMap.setMyLocationEnabled(BuildConfig.DEBUG);
         mMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
-
-
     private void prcOnMapReady()  {
         mMap.setOnMapClickListener(this);
         mPresenter.setOnMapReady();
     }
 
+    @Override
+    protected void onRestart() {
+        Log.d("Ger", "onRestart");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d("Ger", "onRestart");
+        super.onPause();
+    }
 
     @Override
     public void onMapClick(LatLng poLatLng) {
@@ -208,7 +223,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
-
 
     public void showMessage(String psMsg) {
         setVisible(frameLayout, VISIBLE, true);
@@ -313,7 +327,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (pbanimate) poView.setVisibility(piVisible);
             }
         }
-
     }
 
     public void showZoomButton() {
@@ -347,4 +360,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         return true;
     }
+
 }

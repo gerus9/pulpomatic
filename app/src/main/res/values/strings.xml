@@ -13,5 +13,7 @@
     <string name="send_tweet">Enviar tweet</string>
     <string name="description_image">Snapshot google maps</string>
     <string name="progress_snapshot">Tomando la cáptura de pantalla</string>
+    <string name="findMe">Localizame</string>
+    <string name="zoom">Zoom</string>
 
 </resources>

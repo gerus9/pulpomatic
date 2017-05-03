@@ -59,7 +59,6 @@ public class MapsPresenterImpl implements MapsPresenter {
     public void stop() {
         mInteractor.setActivityLive(false);
         if(!isPreviousMarker()){
-            Log.e("unbindService", "servicio");
             mView.unbindService(mInteractor.getLocationConnection());
             Log.e("unbindService", "OK");
         }
@@ -69,7 +68,6 @@ public class MapsPresenterImpl implements MapsPresenter {
     @Override
     public void terminate() {
         if (!isPreviousMarker()) {
-            Log.e("MUEReeeeeee", "servicio");
             mView.stopService(Navigator.getService(getContext()));
         }
     }
@@ -99,16 +97,21 @@ public class MapsPresenterImpl implements MapsPresenter {
 
     @Override
     public void setOnMapReady() {
-
+        Log.d("Ger-Presenter", "setOnMapReady: ");
         mView.setOriginalPaddingMaps();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                Log.d("Ger-Presenter", "Handler: ");
                 if (mInteractor.getCurrentPosition() != null) {
+                    Log.d("Ger-Presenter", "Handler 1 ");
                     onPositionChange(mInteractor.getCurrentPosition());
+                    Log.d("Ger-Presenter", "Handler 2 ");
                     mView.showCenterMap(mInteractor.getCurrentPosition());
+                    Log.d("Ger-Presenter", "Handler 3 ");
                 }
                 if (isPreviousMarker()) {
+                    Log.d("Ger-Presenter", "Handler 4 ");
                     showDestinyMarker(mInteractor.getDestinyMarker());
                 }
             }

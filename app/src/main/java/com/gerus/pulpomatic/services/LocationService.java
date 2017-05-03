@@ -20,6 +20,7 @@ import android.util.Log;
 import com.gerus.pulpomatic.models.RulesVO;
 import com.gerus.pulpomatic.notifications.Notifications;
 import com.gerus.pulpomatic.sharedPreferences.MapsSP;
+import com.gerus.pulpomatic.views.maps.MapsActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -29,8 +30,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    public static final int LOCATION_INTERVAL_DEFAULT = 600000;  // 10 min
-    public static final float LOCATION_DISTANCE_DEFAULT = 600f;  //
+    public static final int LOCATION_INTERVAL_DEFAULT = 450000;  // 10 min
+    public static final float LOCATION_DISTANCE_DEFAULT = 500f;  //
 
     private LocationCallback mCallback;
     private Location mLastLocation = new Location("");
@@ -39,7 +40,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private LocationRequest mLocationRequest;
 
     private static final String TAG = LocationService.class.getSimpleName();
-    private static boolean isActiveAlive = false;
+    private boolean isActiveAlive = false;
 
     private int LOCATION_INTERVAL = LOCATION_INTERVAL_DEFAULT;
     private float LOCATION_DISTANCE = LOCATION_DISTANCE_DEFAULT;
@@ -48,9 +49,15 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private final IBinder mBinder = new LocalBinder();
     private RulesVO mRules;
     private Notifications mNotifications;
+    private MapsSP mapsSP;
 
 
     public Location getDestiny() {
+        if(mDestiny!=null){
+            return mDestiny;
+        } else {
+            setDestiny(mapsSP.getLastDestinyPosition());
+        }
         return mDestiny;
     }
 
@@ -78,9 +85,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             mRules.setDistance(mLastLocation.distanceTo(getDestiny()));
             Log.e(TAG, "distance: " + mRules.getDistance());
             prcUpdateIntervals(mRules.getDistance());
-            if (isActiveAlive && mCallback != null) {
-                Log.e(TAG, "mCallback: " + (mCallback == null) + "");
-                Log.e(TAG, "mRules: " + (mRules == null) + "");
+            if (MapsActivity.isLive && mCallback != null) {
                 mCallback.onDistance(mRules);
             } else {
                 prcShowNotification();
@@ -91,15 +96,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     private void prcUpdateIntervals(double poDistance) {
         if (poDistance < RulesVO.MAX_VALUE) {
-            Log.e(TAG, " *** poDistance > RulesVO.MAX_VALUE *** ");
-
-            Log.e(TAG, " *** mRules.LOCATION_INTERVAL: "+mRules.LOCATION_INTERVAL);
-            Log.e(TAG, " *** LOCATION_INTERVAL: "+ LOCATION_INTERVAL);
-
             if (mRules.LOCATION_INTERVAL != LOCATION_INTERVAL) {
                 LOCATION_INTERVAL = mRules.LOCATION_INTERVAL;
                 LOCATION_DISTANCE = mRules.LOCATION_DISTANCE;
-                Log.e(TAG, " *** Cambie los listeners *** ");
                 mLocationRequest.setInterval(mRules.LOCATION_INTERVAL);
                 mLocationRequest.setSmallestDisplacement(mRules.LOCATION_DISTANCE);
 
@@ -193,8 +192,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     @Override
     public void onCreate() {
-        Log.e(TAG, "onCreate " + isActiveAlive);
-        isActiveAlive = false;
         init();
     }
 
@@ -207,12 +204,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
+        mapsSP = new MapsSP(getApplicationContext());
         mRules = new RulesVO(getApplication());
         mNotifications = new Notifications(getApplication());
-        LatLng voDestiny = new MapsSP(getApplication()).getLastDestinyPosition();
-        if (voDestiny != null) {
-            setDestiny(voDestiny);
-        }
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)

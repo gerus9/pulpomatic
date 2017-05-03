@@ -15,7 +15,6 @@
         app:cameraTargetLng="-99.133209"
         app:cameraZoom="13"
         app:mapType="normal"
-        app:uiCompass="true"
         tools:context=".MapsActivity" />
 
     <LinearLayout
